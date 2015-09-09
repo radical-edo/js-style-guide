@@ -537,6 +537,19 @@
     })('a', 'b', 'c', 'd');
     ```
 
+    is ok.
+
+  - to operate on _`arguments`_ and treat is a array-like object you would have to write your own utility functions
+    to wrap the code. this is where `lodash` comes helpful. using lodash's function will solve this problem for us
+
+    ```javascript
+    (function () {
+      return _.map(arguments, function (arg, i) { 
+        return arg;
+      }).join(', ');
+    })('a', 'b');
+    ```
+
 **[⬆ back to top](#table-of-contents)**
 
 ## Strings
@@ -1447,5 +1460,6 @@
 ## Reference
 
   - [RisingStack](https://github.com/RisingStack/node-style-guide)
+  - [OptimizationKillerrs](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers)
 
 **[⬆ back to top](#table-of-contents)**
