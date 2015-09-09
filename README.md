@@ -1,24 +1,22 @@
 
 ## Table of Contents
 
+  1. [Dictionary](#dictionary)
   1. [General Rules](#general-rules)
+  1. [Code formatting and styling](#code-formatting-and-styling)
   1. [Objects](#objects)
   1. [Loops](#loops)
-  1. [Switch-case](#switch-case)
+  1. [Conditionals](#conditionals)
   1. [Arrays](#arrays)
+  1. [Arguments](#arguments)
   1. [Strings](#strings)
   1. [Functions](#functions)
   1. [Properties](#properties)
   1. [Variables](#variables)
-  1. [Requires](#requires)
   1. [Callbacks](#callbacks)
   1. [Try-catch](#try-catch)
   1. [Conditional Expressions & Equality](#conditional-expressions--equality)
-  1. [Blocks](#blocks)
   1. [Comments](#comments)
-  1. [Whitespace](#whitespace)
-  1. [Commas](#commas)
-  1. [Semicolons](#semicolons)
   1. [Type Casting & Coercion](#type-casting--coercion)
   1. [Naming Conventions](#naming-conventions)
   1. [Accessors](#accessors)
@@ -26,22 +24,314 @@
   1. [License](#license)
   1. [Reference](#reference)
 
+## Dictionary
+
+  Some terms are used in this style guide, which may be confusing for a reader
+
+  - `class` - will refere to any method of serving objects, wheter it's a *ES6* classes which basically are
+    *CoffeeScript* classes, or those are object factories. Examples:
+
+  ```js
+  var ClassName = (function () { // ES6/CoffeeScript class pattern in ES5
+    function ClassName() {}
+
+    ClassName.prototype.instanceMethod = function () {
+    };
+
+    return ClassName;
+  })();
+
+  var classInstance = new ClassName();
+
+  var factoryName = function () { // object factory pattern
+    var factoryInstance = {};
+
+    factoryInstance.instanceMethod = function () {
+    };
+
+    return factoryInstance;
+  };
+
+  var factoryObject = factoryName();
+  ```
+
+  - `const` reverse to variables that cannot be changed and are only once defined.
+    This is a feature of *ES6*, however in *ES5* you have to keep that in mind when coding.
+
 ## General Rules
 
   - use `'use strict';` mode
 
   - always prefer functional programing over procedual. Meaning write a lot of small functions
-    instead of one big function that does everything. 
+    instead of one big function that does everything. Doing so will facilitate function chains, which in turn improve code readability
 
-  - a file should have at the most 100 lines of code
+  - a `class` should have at the most 100 lines of code.
 
   - a single line of code should have at the most 100 columns wide. white spaces count
 
-  - writting a lot of small functions will facilitate function chains. improves readability a lot
-
   - in every project you should always include at least some sort of utility library, examples: `lodash`, `mout`
     the reason being we don't want to re-invent the wheel. maybe you won't need them in the first few
-    days of development. but down the line you'll need them.
+    days of development. but down line..., you will.
+
+
+**[⬆ back to top](#table-of-contents)**
+
+## Code formatting and styling
+
+  - semicolons **Yup.**
+
+    ```javascript
+    // bad
+    (function() {
+      var name = 'Skywalker'
+      return name
+    })()
+
+    // good
+    (function() {
+      var name = 'Skywalker';
+      return name;
+    })();
+
+    // good
+    ;(function() {
+      var name = 'Skywalker';
+      return name;
+    })();
+    ```
+  - Leading commas: **Nope.**
+
+    ```javascript
+    // bad
+    var hero = {
+        firstName: 'Bob'
+      , lastName: 'Parr'
+      , heroName: 'Mr. Incredible'
+      , superPower: 'strength'
+    };
+
+    // good
+    var hero = {
+      firstName: 'Bob',
+      lastName: 'Parr',
+      heroName: 'Mr. Incredible',
+      superPower: 'strength'
+    };
+    ```
+
+  - Additional trailing comma: **Nope.** This can cause problems with IE6/7 and IE9 if it's in quirksmode. Also, in some implementations of ES3 would add length to an array if it had an additional trailing comma. This was clarified in ES5 ([source](http://es5.github.io/#D)):
+
+  > Edition 5 clarifies the fact that a trailing comma at the end of an ArrayInitialiser does not add to the length of the array. This is not a semantic change from Edition 3 but some implementations may have previously misinterpreted this.
+
+    ```javascript
+    // bad
+    var hero = {
+      firstName: 'Kevin',
+      lastName: 'Flynn',
+    };
+
+    var heroes = [
+      'Batman',
+      'Superman',
+    ];
+
+    // good
+    var hero = {
+      firstName: 'Kevin',
+      lastName: 'Flynn'
+    };
+
+    var heroes = [
+      'Batman',
+      'Superman'
+    ];
+    ```
+
+  - Use soft tabs set to 2 spaces
+
+    ```javascript
+    // bad
+    function () {
+    ∙∙∙∙var name;
+    }
+
+    // bad
+    function () {
+    ∙var name;
+    }
+
+    // good
+    function () {
+    ∙∙var name;
+    }
+    ```
+
+  - Place 1 space before the leading brace.
+
+    ```javascript
+    // bad
+    function test(){
+      console.log('test');
+    }
+
+    // good
+    function test() {
+      console.log('test');
+    }
+
+    // bad
+    dog.set('attr',{
+      age: '1 year',
+      breed: 'Bernese Mountain Dog'
+    });
+
+    // good
+    dog.set('attr', {
+      age: '1 year',
+      breed: 'Bernese Mountain Dog'
+    });
+    ```
+
+  - Set off operators with spaces.
+
+    ```javascript
+    // bad
+    var x=y+5;
+
+    // good
+    var x = y + 5;
+    ```
+
+  - End files with a single newline character.
+
+    ```javascript
+    // bad
+    (function(global) {
+      // ...stuff...
+    })(this);
+    ```
+
+    ```javascript
+    // bad
+    (function(global) {
+      // ...stuff...
+    })(this);↵
+    ↵
+    ```
+
+    ```javascript
+    // good
+    (function(global) {
+      // ...stuff...
+    })(this);↵
+    ```
+
+  - Use indentation when making long method chains.
+
+    ```javascript
+    // bad
+    $('#items').find('.selected').highlight().end().find('.open').updateCount();
+
+    // good
+    $('#items')
+      .find('.selected')
+        .highlight()
+        .end()
+      .find('.open')
+        .updateCount();
+
+    // bad
+    var leds = stage.selectAll('.led').data(data).enter().append('svg:svg').class('led', true)
+        .attr('width',  (radius + margin) * 2).append('svg:g')
+        .attr('transform', 'translate(' + (radius + margin) + ',' + (radius + margin) + ')')
+        .call(tron.led);
+
+    // good
+    var leds = stage.selectAll('.led')
+        .data(data)
+      .enter().append('svg:svg')
+        .class('led', true)
+        .attr('width',  (radius + margin) * 2)
+      .append('svg:g')
+        .attr('transform', 'translate(' + (radius + margin) + ',' + (radius + margin) + ')')
+        .call(tron.led);
+    ```
+
+  - naming
+
+    - `class` names are *pascal cased* with the exception of _factory patter_ - this has to be *camel cased*
+    - instance names, variable names, functions names are *camel cased*
+    - `const` names are *capitalized* and *snaked cased* - example `THIS_IS_A_CONST_VARIABLE = 12`
+      Idea is for this variable to stand out and inform the developer no to re-define this variable.
+
+  - _`require`_ if in CommonJS envrioment. require in the following order (and always on top of the file):
+
+    1. core modules
+    1. *npm* modules
+    1. others
+  
+    with space in between each type of requires, example:
+
+    ```javascript
+    var fs = require('fs');
+    var path = require('path');
+
+    var _ = require('lodash');
+    var Promise = require('bluebird');
+
+    var User = require('../models/user');
+    var Post = require('../models/post');
+    ```
+
+  - _`module.exports`_
+  
+    - is only called once per file
+
+    - no need to crawl through the file and see what has been exported. it should always be visible
+      and easy to find
+
+    - exported value is always at the end of the file.
+
+    - nothing can be written after the export statment
+
+
+  - Do not use the `.js` when requiring modules
+
+    ```javascript
+      // bad
+      var Batmobil = require('./models/Car.js');
+
+      // good
+      var Batmobil = require('./models/Car');
+    ```
+
+
+**[⬆ back to top](#table-of-contents)**
+
+  - file names
+
+    Although the convetion in JavaScript any names are usally *camel cased* the file names should be *snaked cased*, mening: `user_store.js` over `userStore.js` or `UserStore.js` or even `userstore.js`. 
+    Mostly because for *git* there is no difference between last 3 examples.
+
+  - _`if..else`_
+  
+  ```js
+  // good
+  if (/* condition */) {
+  } else {
+  }
+  ```
+
+  - _`function`_
+
+  ```javascript
+  // good
+  function () {
+  }
+
+  function namedFn() {
+  }
+  ```
 
 
 **[⬆ back to top](#table-of-contents)**
@@ -50,9 +340,8 @@
 
   - prefer promises over callbacks
 
-    As a general rule when you need to handle an asynchronus code use promises if this at all possible
-    if handling with a bult-in method that doesn't return a promise consider wrapping that peace of code
-    and return a promise
+    As a general rule when you need to handle an asynchronus code use promises if this at all possible.
+    If handling with a bult-in method that doesn't return a promise consider wrapping that peace of code and return a promise
 
     ```javascript
       function readFromFile(filePath) {
@@ -73,6 +362,22 @@
         })
     ```
 
+    Or if you have *bluebird* package available (which you should), consider using `Promise.promisifyAll`
+
+    ```javascript
+    var fs = require('fs');
+
+    var Promise = require('bluebird');
+
+    Promise.promisifyAll(fs);
+
+    fs.readFileAsync('package.json')
+      .then(function (data) {})
+      .catch(function (err) {});
+    ```
+
+    More on [promisifcation|https://github.com/petkaantonov/bluebird/blob/master/API.md#promisification]
+
 **[⬆ back to top](#table-of-contents)**
 
 ## Objects
@@ -86,26 +391,6 @@
     // good
     var item = {};
     ```
-
-  - Use readable synonyms in place of reserved words.
-
-    ```javascript
-    // bad
-    var superman = {
-      class: 'alien'
-    };
-
-    // bad
-    var superman = {
-      klass: 'alien'
-    };
-
-    // good
-    var superman = {
-      type: 'alien'
-    };
-    ```
-
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -158,20 +443,39 @@
   });
   ```
 
-## Switch case
+## Conditionals
 
-  - don't use them
-    
-    generally `switch-case` promotes a big function that has a tendency to blow out of a proportion
-    hard to maintain and over time. such function will have a big cyclomatic complexity
+  - _`switch..case`_
 
-  - instead use one of the following
-    
-    as [strategyPattern](http://encosia.com/first-class-functions-as-an-alternative-to-javascripts-switch-statement)
+    - do not use it
+      
+      generally `switch..case` promotes a big function that has a tendency to blow out of a proportion
+      hard to maintain and over time. such function will have a big cyclomatic complexity
 
-    or us inheritance
+    - instead use one of the following
+      
+      as [strategyPattern](http://encosia.com/first-class-functions-as-an-alternative-to-javascripts-switch-statement)
 
+      or us inheritance
 
+    - as a side note
+      `switch..case` can have up to 128 _case-clauses_, any more than that and the function is not optimizable
+
+  - `if..else`
+
+    - try to avoid `if..else if..else`
+      
+      meaning this
+
+      ```javascript
+      if () {
+      } else if () {
+      } else {
+      }
+      ```
+
+      for the same reasons as why not to use `switch..case` the function will grow in size and becomes hard to maintain
+      if the `else..if` will be added and added.
 
 ## Arrays
 
@@ -214,16 +518,6 @@
     itemsCopy = items.slice();
     ```
 
-  - To convert an array-like object to an array, use Array#slice.
-
-    ```javascript
-    function trigger() {
-      var args = Array.prototype.slice.call(arguments);
-      ...
-    }
-    ```
-
-
 **[⬆ back to top](#table-of-contents)**
 
 
@@ -246,6 +540,7 @@
     ```
 
   - Strings longer than 80 characters should be written across multiple lines using string concatenation.
+
   - Note: If overused, long strings with concatenation could impact performance. [jsPerf](http://jsperf.com/ya-string-concat) & [Discussion](https://github.com/airbnb/javascript/issues/40)
 
     ```javascript
@@ -269,8 +564,6 @@
     ```javascript
     var items;
     var messages;
-    var length;
-    var i;
 
     messages = [{
       state: 'success',
@@ -283,20 +576,25 @@
       message: 'This one did not work.'
     }];
 
-    length = messages.length;
-
     // bad
     function inbox(messages) {
       items = '<ul>';
-
-      messages.forEach(function (message) {
-        items += '<li>' + message.message + '</li>';
-      });
-
+      for (var i = 0; i < messages.length; ++i) {
+        items += '<li>' + messages[i].message + '</li>';
+      }
       return items + '</ul>';
     }
 
     // good
+    function inbox(messages) {
+      items = '<ul>';
+      messages.forEach(function (message) {
+        items += '<li>' + message.message + '</li>';
+      });
+      return items + '</ul>';
+    }
+
+    // better
     function inbox(messages) {
       return '<ul><li>' + messages.map(function (message) {
         return message.message;
@@ -410,7 +708,9 @@
 
 ## Variables
 
-  - Always use `var` to declare variables. Not doing so will result in global variables. We want to avoid polluting the global namespace. Captain Planet warned us of that.
+  - Always use `var` to declare variables. Not doing so will result in global variables. We want to avoid polluting the global namespace.
+    Captain Planet warned us of that. As mentioned in the [General rules](#general-rules) section you should always `use strict` mode. So the this action will
+    raise an error.
 
     ```javascript
     // bad
@@ -434,7 +734,7 @@
      var dragonball = 'z';
     ```
 
-    If there are too many declartions in a function, chances are the functions has too many resposiblities
+    If there are too many declartions in a function, chances are the functions is to big and has too many resposiblities
 
   - Declare unassigned variables last. This is helpful when later on you might need to assign a variable depending on one of the previous assigned variables.
 
@@ -521,57 +821,11 @@
     }
     ```
 
-## Exports
-
-  - `module.exports` is only called once per file
-
-    no need to crawl through the file and see what has been exported. it should always be visible
-    and easy to find
-
-  - exported value is always at the end of the file.
-
-    nothing can be written after the export statment
-
-## Requires
-
-  - Organize your node requires in the following order:
-      - core modules
-      - npm modules
-      - others
-
-    ```javascript
-    // bad
-    var Car = require('./models/Car');
-    var async = require('async');
-    var http = require('http');
-
-    // good
-    var http = require('http');
-    var fs = require('fs');
-
-    var async = require('async');
-    var mongoose = require('mongoose');
-
-    var Car = require('./models/Car');
-    ```
-
-  - Do not use the `.js` when requiring modules
-
-  ```javascript
-    // bad
-    var Batmobil = require('./models/Car.js');
-
-    // good
-    var Batmobil = require('./models/Car');
-
-  ```
-
-
-**[⬆ back to top](#table-of-contents)**
-
 ## Callbacks
 
-  - Always check for errors in callbacks
+  - *Promises over callbacks*, but if you do have them. follow rules mentioned below
+
+  - Always check for errors in callbacks. in *node.js* first argument of a callback will be an `error` object
 
   ```javascript
   //bad
@@ -610,29 +864,6 @@
     }
     console.log(drabonballs);
   });
-  ```
-
-  - Use descriptive arguments in your callback when it is an "interface" for others. It makes your code readable.
-
-  ```javascript
-  // bad
-  function getAnimals(done) {
-    Animal.get(done);
-  }
-
-  // good
-  function getAnimals(done) {
-    Animal.get(function(err, animals) {
-      if(err) {
-        return done(err);
-      }
-
-      return done(null, {
-        dogs: animals.dogs,
-        cats: animals.cats
-      })
-    });
-  }
   ```
 
 **[⬆ back to top](#table-of-contents)**
@@ -703,34 +934,21 @@
     but most of the times those neither of those values are acceptable. so no need to write
     explicitly `obj.bar === null && obj.bar === undefined`
 
-**[⬆ back to top](#table-of-contents)**
+  - don't build complicated conditinals it's hard to follow them, consider wrapping some condtions into a single function
 
+  ```javascript
+  // bad
+  if (user1.hasHand() && user1.isFriendlyTwords(user2) && user2.hasHand() && user2.isFriendlyTwords(user1)) {
+    user1.greets(user2);
+    user2.greets(user1);
+  }
 
-## Blocks
-
-  - Use braces with all multi-line blocks.
-
-    ```javascript
-    // bad
-    if (test)
-      return false;
-
-    // bad
-    if (test) return false;
-
-    // good
-    if (test) {
-      return false;
-    }
-
-    // bad
-    function() { return false; }
-
-    // good
-    function() {
-      return false;
-    }
-    ```
+  // good
+  if (user1.wantsToShakeHandWith(user2) && user2.wantsToShakeHandWith(user1)) {
+    user1.greets(user2);
+    user2.greets(user1);
+  }
+  ```
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -769,7 +987,7 @@
     }
     ```
 
-  - Never comment a piece of code. If it's commented out then it's not needed. Just delete it.
+  - Never comment out a piece of code. If it's commented out then it's not needed. Just delete it.
 
   - Don't use comments to explain a functionality. If the code is to hard to understand and it's confusing
     you should refactor it.
@@ -786,9 +1004,7 @@
     console.log(total);
     ```
 
-  - Prefixing your comments with `FIXME` or `TODO` helps other developers quickly understand if you're pointing out a problem that needs to be revisited, or if you're suggesting a solution to the problem that needs to be implemented. These are different than regular comments because they are actionable. The actions are `FIXME -- need to figure this out` or `TODO -- need to implement`.
-
-  - Use `// FIXME:` to annotate problems
+  - Do not use `// FIXME:` to annotate problems
 
     ```javascript
     function Calculator() {
@@ -800,7 +1016,9 @@
     }
     ```
 
-  - Use `// TODO:` to annotate solutions to problems
+    if there is a problem, fix it, don't leave it for later.
+
+  - Do not use `// TODO:` to annotate solutions to problems
 
     ```javascript
     function Calculator() {
@@ -812,202 +1030,10 @@
     }
     ```
 
-**[⬆ back to top](#table-of-contents)**
-
-
-## Whitespace
-
-  - Use soft tabs set to 2 spaces
-
-    ```javascript
-    // bad
-    function () {
-    ∙∙∙∙var name;
-    }
-
-    // bad
-    function () {
-    ∙var name;
-    }
-
-    // good
-    function () {
-    ∙∙var name;
-    }
-    ```
-
-  - Place 1 space before the leading brace.
-
-    ```javascript
-    // bad
-    function test(){
-      console.log('test');
-    }
-
-    // good
-    function test() {
-      console.log('test');
-    }
-
-    // bad
-    dog.set('attr',{
-      age: '1 year',
-      breed: 'Bernese Mountain Dog'
-    });
-
-    // good
-    dog.set('attr', {
-      age: '1 year',
-      breed: 'Bernese Mountain Dog'
-    });
-    ```
-
-  - Set off operators with spaces.
-
-    ```javascript
-    // bad
-    var x=y+5;
-
-    // good
-    var x = y + 5;
-    ```
-
-  - End files with a single newline character.
-
-    ```javascript
-    // bad
-    (function(global) {
-      // ...stuff...
-    })(this);
-    ```
-
-    ```javascript
-    // bad
-    (function(global) {
-      // ...stuff...
-    })(this);↵
-    ↵
-    ```
-
-    ```javascript
-    // good
-    (function(global) {
-      // ...stuff...
-    })(this);↵
-    ```
-
-  - Use indentation when making long method chains.
-
-    ```javascript
-    // bad
-    $('#items').find('.selected').highlight().end().find('.open').updateCount();
-
-    // good
-    $('#items')
-      .find('.selected')
-        .highlight()
-        .end()
-      .find('.open')
-        .updateCount();
-
-    // bad
-    var leds = stage.selectAll('.led').data(data).enter().append('svg:svg').class('led', true)
-        .attr('width',  (radius + margin) * 2).append('svg:g')
-        .attr('transform', 'translate(' + (radius + margin) + ',' + (radius + margin) + ')')
-        .call(tron.led);
-
-    // good
-    var leds = stage.selectAll('.led')
-        .data(data)
-      .enter().append('svg:svg')
-        .class('led', true)
-        .attr('width',  (radius + margin) * 2)
-      .append('svg:g')
-        .attr('transform', 'translate(' + (radius + margin) + ',' + (radius + margin) + ')')
-        .call(tron.led);
-    ```
+    if there is something that you think will improve the code base do it. don't leave it for later.
+    chances are that you will never do it and the comment will be there forever.
 
 **[⬆ back to top](#table-of-contents)**
-
-## Commas
-
-  - Leading commas: **Nope.**
-
-    ```javascript
-    // bad
-    var hero = {
-        firstName: 'Bob'
-      , lastName: 'Parr'
-      , heroName: 'Mr. Incredible'
-      , superPower: 'strength'
-    };
-
-    // good
-    var hero = {
-      firstName: 'Bob',
-      lastName: 'Parr',
-      heroName: 'Mr. Incredible',
-      superPower: 'strength'
-    };
-    ```
-
-  - Additional trailing comma: **Nope.** This can cause problems with IE6/7 and IE9 if it's in quirksmode. Also, in some implementations of ES3 would add length to an array if it had an additional trailing comma. This was clarified in ES5 ([source](http://es5.github.io/#D)):
-
-  > Edition 5 clarifies the fact that a trailing comma at the end of an ArrayInitialiser does not add to the length of the array. This is not a semantic change from Edition 3 but some implementations may have previously misinterpreted this.
-
-    ```javascript
-    // bad
-    var hero = {
-      firstName: 'Kevin',
-      lastName: 'Flynn',
-    };
-
-    var heroes = [
-      'Batman',
-      'Superman',
-    ];
-
-    // good
-    var hero = {
-      firstName: 'Kevin',
-      lastName: 'Flynn'
-    };
-
-    var heroes = [
-      'Batman',
-      'Superman'
-    ];
-    ```
-
-**[⬆ back to top](#table-of-contents)**
-
-
-## Semicolons
-
-  - **Yup.**
-
-    ```javascript
-    // bad
-    (function() {
-      var name = 'Skywalker'
-      return name
-    })()
-
-    // good
-    (function() {
-      var name = 'Skywalker';
-      return name;
-    })();
-
-    // good
-    ;(function() {
-      var name = 'Skywalker';
-      return name;
-    })();
-    ```
-
-**[⬆ back to top](#table-of-contents)**
-
 
 ## Type Casting & Coercion
 
@@ -1083,6 +1109,25 @@
 
 
 ## Naming Conventions
+
+  - Use readable synonyms in place of reserved words.
+
+    ```javascript
+    // bad
+    var superman = {
+      class: 'alien'
+    };
+
+    // bad
+    var superman = {
+      klass: 'alien'
+    };
+
+    // good
+    var superman = {
+      type: 'alien'
+    };
+    ```
 
   - Avoid single letter names. Be descriptive with your naming.
 
