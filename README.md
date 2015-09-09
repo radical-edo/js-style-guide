@@ -520,6 +520,24 @@
 
 **[⬆ back to top](#table-of-contents)**
 
+## Arguments
+
+  `arguments` are a bit tricky since they are wrong usage can cause optimization problems. Only the following usages is considered safe.
+
+  - `arguments.length`
+  - `arguments[i]`, *where `i` is always a valid integer index into the `arguments`, and cannot be out of bound*
+  - `Function#apply`, meaning
+    
+    ```javascript
+    var instance = new Instance();
+    var fn = function fn() {}
+
+    (function () {
+      fn.apply(instnace, arguments);
+    })('a', 'b', 'c', 'd');
+    ```
+
+**[⬆ back to top](#table-of-contents)**
 
 ## Strings
 
@@ -871,7 +889,7 @@
 
 ## Try catch
 
-- Only throw in synchronous functions
+  - only throw in synchronous functions
 
   Try-catch blocks cannot be used to wrap async code. They will bubble up to to the top, and bring
   down the entire process.
@@ -897,19 +915,56 @@
   }
   ```
 
-- Catch errors in sync calls
+  - in synchronus function the `try..catch` causes problems. mainly due the fact that this function cannot be optimized.
+    Nontheless, sometimes this cannot be avoided, but the damage can be minized
 
   ```javascript
-  //bad
-  var data = JSON.parse(jsonAsAString);
+  // bad
+  var parseJson = function parseJson(string) {
+    var data;
+    try {
+      data = JSON.parse(string);
+    } catch (e) {
+      return console.error('Invalid JSON string');
+    }
+    // do something with the 'data'
+    // ...
+  }
 
-  //good
-  var data;
-  try {
-    data = JSON.parse(jsonAsAString);
-  } catch (e) {
-    //handle error - hopefully not with a console.log ;)
-    console.log(e);
+  // good
+  var tryCatch = function tryCatch(fn, ctx, args) {
+    try {
+      return fn.apply(ctx, args);
+    } catch (e) {
+      return e;
+    }
+  }
+
+  var parseJson = function parseJson(string) {
+    var data = tryCatch(JSON.parse, null, [string]);
+    if (data instanceof Error) {
+      return console.error('Invalid JSON string');
+    }
+    // do something with the 'data'
+    // ...
+  }
+  ```
+
+  the `tryCatch` function contains the part of the code that's not optimized, this allows `parseJson` function to be optimized.
+
+  with *lodash*
+  ```javascript
+  // better
+
+  var _ = require('lodash');
+
+  var parseJson = function parseJson(string) {
+    var data = _.attempt(JSON.parse.bind(null, str));
+    if (_.isError(data)) {
+      return console.error('Invalid JSON string');
+    }
+    // do something with the 'data'
+    // ...
   }
   ```
 
