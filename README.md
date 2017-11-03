@@ -65,7 +65,7 @@
   - always prefer functional programing over procedual. Meaning write a lot of small functions
     instead of one big function that does everything. Doing so will facilitate function chains, which in turn improve code readability
 
-  - a `class` should have at the most 100 lines of code.
+  - large line count for a `class` is usually a sign it can be split in smaller components. Look for this sign during code reviews.
 
   - a single line of code should have at the most 100 columns wide. white spaces count
 
@@ -99,6 +99,7 @@
       return name;
     })();
     ```
+
   - Leading commas: **Nope.**
 
     ```javascript
@@ -123,29 +124,29 @@
 
   > Edition 5 clarifies the fact that a trailing comma at the end of an ArrayInitialiser does not add to the length of the array. This is not a semantic change from Edition 3 but some implementations may have previously misinterpreted this.
 
-    ```javascript
-    // bad
-    var hero = {
-      firstName: 'Kevin',
-      lastName: 'Flynn',
-    };
+  ```javascript
+  // bad
+  var hero = {
+    firstName: 'Kevin',
+    lastName: 'Flynn',
+  };
 
-    var heroes = [
-      'Batman',
-      'Superman',
-    ];
+  var heroes = [
+    'Batman',
+    'Superman',
+  ];
 
-    // good
-    var hero = {
-      firstName: 'Kevin',
-      lastName: 'Flynn'
-    };
+  // good
+  var hero = {
+    firstName: 'Kevin',
+    lastName: 'Flynn'
+  };
 
-    var heroes = [
-      'Batman',
-      'Superman'
-    ];
-    ```
+  var heroes = [
+    'Batman',
+    'Superman'
+  ];
+  ```
 
   - Use soft tabs set to 2 spaces
 
@@ -570,26 +571,6 @@
     var fullName = 'Bob ' + this.lastName;
     ```
 
-  - Strings longer than 80 characters should be written across multiple lines using string concatenation.
-
-  - Note: If overused, long strings with concatenation could impact performance. [jsPerf](http://jsperf.com/ya-string-concat) & [Discussion](https://github.com/airbnb/javascript/issues/40)
-
-    ```javascript
-    // bad
-    var errorMessage = 'This is a super long error that was thrown because of Batman. When you stop to think about how Batman had anything to do with this, you would get nowhere fast.';
-
-    // bad
-    var errorMessage = 'This is a super long error that was thrown because \
-    of Batman. When you stop to think about how Batman had anything to do \
-    with this, you would get nowhere \
-    fast.';
-
-    // good
-    var errorMessage = 'This is a super long error that was thrown because ' +
-      'of Batman. When you stop to think about how Batman had anything to do ' +
-      'with this, you would get nowhere fast.';
-    ```
-
   - When programmatically building up a string, use Array#join instead of string concatenation.
 
     ```javascript
@@ -633,6 +614,26 @@
     }
     ```
 
+    Use the same pattern to create larger strings that won't fit in one line, since string concatenation for larger strings can impact performance. [jsPerf](http://jsperf.com/ya-string-concat) & [Discussion](https://github.com/airbnb/javascript/issues/40)
+
+     ```javascript
+    // bad
+    var errorMessage = 'This is a super long error that was thrown because of Batman. When you stop to think about how Batman had anything to do with this, you would get nowhere fast.';
+
+    // bad
+    var errorMessage = 'This is a super long error that was thrown because \
+    of Batman. When you stop to think about how Batman had anything to do \
+    with this, you would get nowhere \
+    fast.';
+
+    // good
+    var errorMessage = [
+      'This is a super long error that was thrown because', 
+      'of Batman. When you stop to think about how Batman had anything to do',
+      'with this, you would get nowhere fast.'
+    ].join(' ');
+    ```
+
 **[⬆ back to top](#table-of-contents)**
 
 
@@ -642,38 +643,23 @@
 
     ```javascript
     // anonymous function expression
+    // BAD -- all functions should be named: 
+    // it shows up on stack trace and helps on debugging sessions
     var anonymous = function () {
       return true;
     };
 
     // named function expression
+    // GOOD
     var named = function named() {
       return true;
     };
 
     // immediately-invoked function expression (IIFE)
+    // GOOD
     (function() {
       console.log('Welcome to the Internet. Please follow me.');
     })();
-    ```
-
-  - Never declare a function in a non-function block (if, while, etc). Assign the function to a variable instead.
-
-    ```javascript
-    // bad
-    if (currentUser) {
-      function test() {
-        console.log('Nope.');
-      }
-    }
-
-    // good
-    var test;
-    if (currentUser) {
-      test = function test() {
-        console.log('Yup.');
-      };
-    }
     ```
 
   - Never name a parameter `arguments`, this will take precedence over the `arguments` object that is given to every function scope.
@@ -690,10 +676,9 @@
     }
     ```
 
-  - Function should never have more than 5 lines of code.
+  - Functions that are too large are usually a sign that it is doing more than just one single responsibility. Look into splitting them into different functions and using them in a [composition](http://eloquentjavascript.net/05_higher_order.html). Look for that during code reviews.
 
-    The idea behind this one is to limit the `function` responsiblities. and it's easier to test
-    the code
+    The idea behind this one is to limit the `function` responsiblities. and it's easier to test the code
 
   - Function should have at the most 3 arguments
     
@@ -1018,6 +1003,47 @@
   }
   ```
 
+  - don't use ternary operators
+
+  ```javascript
+  // bad
+  var status = response.httpCode === 200 ? 'ok' : 'error';
+
+  // good
+  var status;
+  if (response.httpCode === 200) {
+    status = 'ok';
+  } else {
+    status = 'error';
+  }
+  ```
+  Abusing ternary operators will lead to less readable code, and the same can be accomplished on notation that displays clearer intentions.
+
+  - prefer null coalescing instead of null checking
+
+  ```javascript
+  // bad
+  function callMethodOnValue(value) {
+    if (value) {
+      value.property.method();
+    }
+  }
+
+  // not that bad
+  function callMethodOnValue(value) {
+    if (value !== null && value !== undefined) {
+      value.property.method();
+    }
+  }
+
+  // good
+  function callMethodOnValue(value) {
+    var emptyValue = { property: { method: function method() {} } };
+    var objectToUse = value || emptyValue;
+    objectToUse.property.method();
+  }
+  ```
+
 **[⬆ back to top](#table-of-contents)**
 
 
@@ -1060,16 +1086,19 @@
   - Don't use comments to explain a functionality. If the code is to hard to understand and it's confusing
     you should refactor it.
 
-  - Avoid unnecesary or pointless comments f.e.
+  - Avoid unnecesary or pointless comments. Remember [Code Tells You How, Comments Tell You Why](https://blog.codinghorror.com/code-tells-you-how-comments-tell-you-why/). Always link relevant information.
 
     ```javascript
+    // bad
     // declaring `total` variable and setting it to 0
     var total = 0;
 
-    //....
-
-    // logging into the console the acumulated `total` value
-    console.log(total);
+    // good
+    /* 
+      A bug in IE8 (https://stackoverflow.com/questions/22285569/canvas-not-working-in-ie8-browsers)
+      will cause canvas not to initialize, so we do it manually here.
+    */
+    G_vmlCanvasManager.initElement(canvas);
     ```
 
   - Do not use `// FIXME:` to annotate problems
@@ -1105,48 +1134,33 @@
 
 ## Type Casting & Coercion
 
-  - Perform type coercion at the beginning of the statement.
-  - Strings:
+  - Avoid implicit type coercion entirely
+  ```javascript
+  // => this.reviewScore = 9;
 
-    ```javascript
-    //  => this.reviewScore = 9;
+  // bad
+  var stringTotalScore = this.reviewScore + '';
+  var numberTotalScore = +stringTtotalScore;
+  var numberTotalScore = stringTotalScore >> 0;
+  var numberTotalScore = parseInt(stringTotalScore);
+  var numberTotalScore = Number(stringTotalScore);
+  
+  // bad
+  var value = 'false';
+  var boolValue = !!'false'; // false
+  var boolValue = !!'undefined'; // true
+  var boolValue = !!new Boolean(false) // true
 
-    // bad
-    var totalScore = this.reviewScore + '';
-
-    // good
-    var totalScore = '' + this.reviewScore;
-
-    // bad
-    var totalScore = '' + this.reviewScore + ' total score';
-
-    // good
-    var totalScore = this.reviewScore + ' total score';
-    ```
-
-  - Use `parseInt` for Numbers and always with a radix for type casting.
-
-    ```javascript
-    var inputValue = '4';
-
-    // bad
-    var val = new Number(inputValue);
-
-    // bad
-    var val = +inputValue;
-
-    // bad
-    var val = inputValue >> 0;
-
-    // bad
-    var val = parseInt(inputValue);
-
-    // good
-    var val = Number(inputValue);
-
-    // good
-    var val = parseInt(inputValue, 10);
-    ```
+  // good
+  var stringTotalScore = this.reviewScore.toString();
+  var numberTotalScore = parseInt(stringTotalScore, 10); /* Always use explicit radix for conversion.
+                                                            Strings prefixed with '0x' or '0' may cause
+                                                            it to be interpreted as hexadecimal or octal
+                                                            respectively */
+  // good
+  var value = 'false';
+  var boolValue = value === 'false';
+  ```
 
   - If for whatever reason you are doing something wild and `parseInt` is your bottleneck and need to use Bitshift for [performance reasons](http://jsperf.com/coercion-vs-casting/3)
 
@@ -1158,20 +1172,6 @@
     2147483649 >> 0 //=> -2147483647
     ```
 
-  - Booleans:
-
-    ```javascript
-    var age = 0;
-
-    // bad
-    var hasAge = new Boolean(age);
-
-    // good
-    var hasAge = Boolean(age);
-
-    // good
-    var hasAge = !!age;
-    ```
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -1263,7 +1263,7 @@
     this._firstName = 'Panda';
     ```
 
-  - When saving a reference to `this` use `_this`.
+  - If you need a refecente to `this` on a closure context, use `Function.bind` instead.
 
     ```javascript
     // bad
@@ -1284,14 +1284,13 @@
 
     // good
     function() {
-      var _this = this;
-      return function() {
-        console.log(_this);
-      };
+      return function logClosure() {
+        console.log();
+      }.bind(this);
     }
     ```
 
-  - Name your functions. This is helpful for stack traces.
+  - Name your functions. This is helpful for stack traces since name will show up in the call stack.
 
     ```javascript
     // bad
